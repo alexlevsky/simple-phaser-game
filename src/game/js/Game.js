@@ -36,7 +36,7 @@ var THREE_IN_ROW_SCORE_AMOUNT = 60;
 var FOUR_IN_ROW_SCORE_AMOUNT = 120;
 var FIVE_IN_ROW_SCORE_AMOUNT =  180;
 
-var TIMER_MINUTE = 0; // timer options
+var TIMER_MINUTE = 1; // timer options
 var TIMER_SECOND = 13;
 
 var gemArray = [ { img: "gem1", color: "red" },
@@ -53,11 +53,13 @@ var selectedGemTween;
 var tempShiftedGem = null;
 var allowInput;
 var scoreText;
-    
+var style = { font: "25px Arial", fill: "#fff", align: "center" };
+var InfoText;  
+ 
 	this.init = function(){
        var style = { font: "50px Arial", fill: "#fff", align: "center" };  //! score text
-     scoreText = game.add.text( 200, 760, SCORE, style);
-     scoreText.anchor.setTo(0.5, 0.5); 
+   //  scoreText = game.debug.text( 200, 100, SCORE, style);
+    // scoreText.anchor.setTo(0.5, 0.5); 
         
 	}
 	
@@ -68,8 +70,8 @@ var scoreText;
        back = game.add.sprite(0, 0, 'background');
        back.scale.setTo(0.52, 0.7);
 
-       bgScore = game.add.sprite(230, 660, 'bgScore');
-
+     //  bgScore = game.add.sprite(230, 660, 'bgScore');
+     
        backAudio = game.add.audio('backgroundAudio');
       // backAudio.autoplay = true;
        backAudio.loop = true;
@@ -87,7 +89,6 @@ var scoreText;
         
        // Create a delayed event 1m and 30s from now
        timerEvent = timer.add(Phaser.Timer.MINUTE * TIMER_MINUTE + Phaser.Timer.SECOND * TIMER_SECOND, this.endTimer, this);
-       
        // Start the timer
        timer.start();
        timer.loop(1000, this.changeTimer, this);
@@ -106,27 +107,17 @@ var scoreText;
      hand = game.add.sprite(game.world.centerX, game.world.centerY, 'hand');
      hand.scale.setTo(0.7, 0.7);  // hand scale 
      game.physics.enable(hand, Phaser.Physics.ARCADE);
-    
-    
-    
     };
 
-
     this.changeTimer = function () {
-        var style = { font: "24px Arial", fill: "#fff", align: "center" };
-
+       // game.debug.text('Points: '+ SCORE, 100, 100, style);
+       InfoText = this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000))  + '\n' + 'Points: ' + SCORE;
         if (timer.running) {
-          //  game.debug.text(this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000)), 2, 14, "#ff0");
-          if(timeText)
-            timeText.kill();
-          timeText = game.add.text( 100, 760, this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000)), style);
-          timeText.anchor.setTo(0.5, 0.5);
-          
+            game.debug.text( InfoText, 2, 14, "#000");
         }
         else {
-          //  game.debug.text("time up !", 2, 14, "#0f0");
-          timeText = game.add.text( 100, 760, "time up !", style);
-          timeText.anchor.setTo(0.5, 0.5);
+           game.debug.text("time up !", 2, 14, "#000");
+        
         }
     },
 
@@ -145,7 +136,7 @@ var scoreText;
     }
 
     this.update = function () {
-      
+        
 
          //!  If the sprite is > 8px away from the pointer then let's move to it
     if (game.physics.arcade.distanceToPointer(hand, game.input.activePointer) > 8)
@@ -223,6 +214,7 @@ var scoreText;
     
     function slideGem(pointer, x, y) {
      console.log("slidegem")
+     
         // check if a selected gem should be moved and do it
         if (selectedGem && pointer.isDown)
         {
@@ -494,7 +486,7 @@ var scoreText;
             case 5 : SCORE += FIVE_IN_ROW_SCORE_AMOUNT; break;
             default: console.log('default score break');
         }
-       scoreText.setText('Points: '+ SCORE);
+        game.debug.text( InfoText, 2, 14, "#000");
     }
     
     // kill all gems from a starting position to an end position
